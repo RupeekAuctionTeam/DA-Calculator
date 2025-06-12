@@ -2,87 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RnRP / ITO Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #eef1f5;
-      margin: 0;
-      padding: 30px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 10px;
     }
 
     .container {
       background: #ffffff;
-      padding: 30px;
-      max-width: 700px;
+      padding: 25px 30px;
+      max-width: 600px;
       margin: auto;
       border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 30px;
-      font-size: 24px;
       color: #333;
+      margin-bottom: 25px;
     }
 
     label {
       display: block;
-      margin: 18px 0 8px;
+      margin-top: 15px;
       font-weight: 600;
-      color: #444;
+      color: #555;
     }
 
-    input[type="number"] {
+    input {
       width: 100%;
-      padding: 10px 12px;
+      padding: 10px;
+      margin-top: 6px;
+      box-sizing: border-box;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      transition: border-color 0.3s ease;
-    }
-
-    input[type="number"]:focus {
-      border-color: #007bff;
-      outline: none;
     }
 
     .result {
       margin-top: 20px;
+      font-weight: bold;
       padding: 12px;
       border-radius: 6px;
-      background-color: #f8f9fa;
       font-size: 16px;
-      font-weight: 500;
+      color: #222;
+      background: #f1f1f1;
     }
 
     .status-green {
-      color: #28a745;
+      background-color: #b7f0b7;
+      color: #000;
     }
 
     .status-red {
-      color: #dc3545;
+      background-color: #ffb7b7;
+      color: #000;
     }
 
-    @media (max-width: 600px) {
-      .container {
-        padding: 20px;
-      }
+    .button-wrap {
+      text-align: center;
+      margin-top: 20px;
+    }
 
-      h2 {
-        font-size: 20px;
-      }
+    button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>RnRP / ITO Calculator</h2>
+  <div class="container" id="capture-area">
 
     <label for="closer">Closer Amount (Inc), Excess Funding:</label>
     <input type="number" id="closer" step="0.01">
@@ -90,16 +92,20 @@
     <label for="netWeight">Net Weight:</label>
     <input type="number" id="netWeight" step="0.01">
 
-    <label for="ltvPrice">LTV Price:</label>
+    <label for="ltvPrice">AGLOG Price:</label>
     <input type="number" id="ltvPrice" step="0.01">
 
-    <label for="ltvPercent">LTV % (e.g., enter 90 for 90%):</label>
+    <label for="ltvPercent">Required LTV %:</label>
     <input type="number" id="ltvPercent" step="0.01">
 
     <div class="result" id="finalLtvPrice"></div>
     <div class="result" id="eligible"></div>
     <div class="result" id="daAmount"></div>
     <div class="result" id="status"></div>
+  </div>
+
+  <div class="button-wrap">
+    <button onclick="downloadImage()">Download Result as Image</button>
   </div>
 
   <script>
@@ -117,7 +123,9 @@
       const daAmount = eligibleAmount - closer;
       const isEligible = eligibleAmount >= closer;
 
-      document.getElementById('finalLtvPrice').innerText = "Final LTV Price: ₹" + finalLtvPrice.toFixed(2);
+      const finalLtvDiv = document.getElementById('finalLtvPrice');
+      finalLtvDiv.innerText = `LTV Price of ${ltvPercent.toFixed(2)}%: ₹${finalLtvPrice.toFixed(2)}`;
+
       document.getElementById('eligible').innerText = "Eligible RnRP/ITO Amount: ₹" + eligibleAmount.toFixed(2);
       document.getElementById('daAmount').innerText = "DA Amount: ₹" + daAmount.toFixed(2);
 
@@ -126,6 +134,31 @@
       statusDiv.innerText = "RnRP / ITO: " + statusText;
       statusDiv.className = "result " + (isEligible ? "status-green" : "status-red");
     }
+
+    function downloadImage() {
+      const captureArea = document.getElementById('capture-area');
+      html2canvas(captureArea).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Eligible Table.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    // Preserve AGLOG Price on page reload
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedPrice = localStorage.getItem('ltvPrice');
+      if (savedPrice !== null) {
+        document.getElementById('ltvPrice').value = savedPrice;
+      }
+      calculate();
+    });
+
+    // Save AGLOG Price manually only on change
+    document.getElementById('ltvPrice').addEventListener('change', () => {
+      const value = document.getElementById('ltvPrice').value;
+      localStorage.setItem('ltvPrice', value);
+    });
   </script>
 </body>
 </html>
