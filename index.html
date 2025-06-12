@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RnRP / ITO Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    .container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-weight: bold;
+      padding: 10px;
+      background: #e6f7ff;
+      border-radius: 5px;
+    }
+
+    .status-green {
+      color: green;
+    }
+
+    .status-red {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>RnRP / ITO Calculator</h2>
+
+    <label for="closer">Closer Amount (Inc), Excess Funding:</label>
+    <input type="number" id="closer" step="0.01">
+
+    <label for="netWeight">Net Weight:</label>
+    <input type="number" id="netWeight" step="0.01">
+
+    <label for="ltv">LTV:</label>
+    <input type="number" id="ltv" step="0.01">
+
+    <div class="result" id="eligible"></div>
+    <div class="result" id="daAmount"></div>
+    <div class="result" id="status"></div>
+  </div>
+
+  <script>
+    const inputs = document.querySelectorAll('#closer, #netWeight, #ltv');
+    inputs.forEach(input => input.addEventListener('input', calculate));
+
+    function calculate() {
+      const closer = parseFloat(document.getElementById('closer').value) || 0;
+      const netWeight = parseFloat(document.getElementById('netWeight').value) || 0;
+      const ltv = parseFloat(document.getElementById('ltv').value) || 0;
+
+      const eligibleAmount = netWeight * ltv;
+      const daAmount = eligibleAmount - closer;
+
+      document.getElementById('eligible').innerText = "Eligible RnRP/ITO Amount: ₹" + eligibleAmount.toFixed(2);
+      document.getElementById('daAmount').innerText = "DA Amount: ₹" + daAmount.toFixed(2);
+
+      const statusText = eligibleAmount >= closer ? "Eligible for Process" : "Need Collect DA";
+      const statusDiv = document.getElementById('status');
+
+      statusDiv.innerText = "RnRP / ITO: " + statusText;
+      statusDiv.className = "result " + (statusText === "Eligible for Process" ? "status-green" : "status-red");
+    }
+  </script>
+</body>
+</html>
