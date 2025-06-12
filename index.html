@@ -18,11 +18,6 @@
       border-radius: 5px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
-    h2 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 25px;
-    }
 
     label {
       display: block;
@@ -39,6 +34,11 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
+    }
+
+    input[readonly] {
+      background-color: #e9ecef;
+      cursor: not-allowed;
     }
 
     .result {
@@ -74,6 +74,7 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      margin: 5px;
       transition: background 0.3s;
     }
 
@@ -81,14 +82,24 @@
       background-color: #0056b3;
     }
 
-    input[readonly] {
-      background-color: #e9ecef;
-      cursor: not-allowed;
+    a.external-link {
+      font-weight: normal;
+      font-size: 14px;
+      margin-left: 5px;
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    a.external-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="container" id="capture-area">
+
+    <label for="customerName">Customer Name:</label>
+    <input type="text" id="customerName" placeholder="Enter customer name">
 
     <label for="closer">Closer Amount (Inc), Excess Funding:</label>
     <input type="number" id="closer" step="0.01">
@@ -96,7 +107,10 @@
     <label for="netWeight">Net Weight:</label>
     <input type="number" id="netWeight" step="0.01">
 
-    <label for="ltvPrice">AGLOG Price:</label>
+    <label for="ltvPrice">
+      AGLOG Price:
+      <a class="external-link" href="https://www.agloc.org/" target="_blank">https://www.agloc.org/</a>
+    </label>
     <input type="number" id="ltvPrice" step="0.01">
 
     <label for="ltvPercent">Required LTV %:</label>
@@ -110,6 +124,7 @@
 
   <div class="button-wrap">
     <button onclick="downloadImage()">Download Result as Image</button>
+    <button onclick="resetForm()">Reset</button>
   </div>
 
   <script>
@@ -127,29 +142,27 @@
       const daAmount = eligibleAmount - closer;
       const isEligible = eligibleAmount >= closer;
 
-      const finalLtvDiv = document.getElementById('finalLtvPrice');
-      finalLtvDiv.innerText = `LTV Price of ${ltvPercent.toFixed(2)}%: ₹${finalLtvPrice.toFixed(2)}`;
-
+      document.getElementById('finalLtvPrice').innerText = `LTV Price of ${ltvPercent.toFixed(2)}%: ₹${finalLtvPrice.toFixed(2)}`;
       document.getElementById('eligible').innerText = "Eligible RnRP/ITO Amount: ₹" + eligibleAmount.toFixed(2);
       document.getElementById('daAmount').innerText = "DA Amount: ₹" + daAmount.toFixed(2);
 
-      const statusText = isEligible ? "Eligible for Process" : "Need Collect DA";
       const statusDiv = document.getElementById('status');
-      statusDiv.innerText = "RnRP / ITO: " + statusText;
+      statusDiv.innerText = "RnRP / ITO: " + (isEligible ? "Eligible for Process" : "Need Collect DA");
       statusDiv.className = "result " + (isEligible ? "status-green" : "status-red");
     }
 
     function downloadImage() {
       const captureArea = document.getElementById('capture-area');
+      const customerName = document.getElementById('customerName').value.trim().replace(/\s+/g, '_') || 'Eligible_Table';
       html2canvas(captureArea).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'Eligible Table.png';
+        link.download = customerName + '_Eligible_Table.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
       });
     }
 
-    // === AGLOG Price Daily Limit Logic ===
+    // AGLOG Price daily lock logic
     const ltvInput = document.getElementById('ltvPrice');
     const today = new Date().toISOString().split('T')[0];
     const storedDate = localStorage.getItem('ltvDate');
@@ -169,7 +182,19 @@
       ltvInput.readOnly = true;
     });
 
-    // Auto-calculate on load
+    function resetForm() {
+      document.getElementById('customerName').value = '';
+      document.getElementById('closer').value = '';
+      document.getElementById('netWeight').value = '';
+      document.getElementById('ltvPercent').value = '';
+      document.getElementById('ltvPrice').readOnly = false;
+      document.getElementById('finalLtvPrice').innerText = '';
+      document.getElementById('eligible').innerText = '';
+      document.getElementById('daAmount').innerText = '';
+      document.getElementById('status').innerText = '';
+    }
+
+    // Auto-calculate on page load
     window.addEventListener('DOMContentLoaded', calculate);
   </script>
 </body>
