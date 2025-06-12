@@ -5,15 +5,15 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Verdana, sans-serif;
       background: #f4f6f8;
-      padding: 10px;
+      padding: 40px;
     }
 
     .container {
       background: #ffffff;
       padding: 5px 20px;
-      max-width: 400px;
+      max-width: 350px;
       margin: auto;
       border-radius: 5px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -21,19 +21,19 @@
 
     label {
       display: block;
-      margin-top: 15px;
-      font-weight: 600;
+      margin-top: 5px;
+      font-weight: 100;
       color: #555;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin-top: 6px;
+      padding: 2px;
+      margin-top: .1px;
       box-sizing: border-box;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      border: 2px solid #ccc;
+      border-radius: 5px;
     }
 
     input[readonly] {
@@ -42,9 +42,9 @@
     }
 
     .result {
-      margin-top: 20px;
+      margin-top: 10px;
       font-weight: bold;
-      padding: 12px;
+      padding: 5px;
       border-radius: 6px;
       font-size: 16px;
       color: #222;
@@ -52,29 +52,29 @@
     }
 
     .status-green {
-      background-color: #b7f0b7;
+      background-color: #30fc44;
       color: #000;
     }
 
     .status-red {
-      background-color: #ffb7b7;
+      background-color: #f78181;
       color: #000;
     }
 
     .button-wrap {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     button {
       background-color: #007bff;
       color: white;
-      padding: 10px 20px;
+      padding: 5px 5px;
       font-size: 16px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      margin: 5px;
+      margin: 1px;
       transition: background 0.3s;
     }
 
@@ -108,7 +108,7 @@
     <input type="number" id="netWeight" step="0.01">
 
     <label for="ltvPrice">
-      AGLOG Price:
+      AGLOC Price:
       <a class="external-link" href="https://www.agloc.org/" target="_blank">https://www.agloc.org/</a>
     </label>
     <input type="number" id="ltvPrice" step="0.01">
@@ -123,7 +123,7 @@
   </div>
 
   <div class="button-wrap">
-    <button onclick="downloadImage()">Download Result as Image</button>
+    <button onclick="downloadImage()">Download Table</button>
     <button onclick="resetForm()">Reset</button>
   </div>
 
