@@ -80,6 +80,11 @@
     button:hover {
       background-color: #0056b3;
     }
+
+    input[readonly] {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -144,20 +149,28 @@
       });
     }
 
-    // Preserve AGLOG Price on page reload
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedPrice = localStorage.getItem('ltvPrice');
-      if (savedPrice !== null) {
-        document.getElementById('ltvPrice').value = savedPrice;
-      }
-      calculate();
+    // === AGLOG Price Daily Limit Logic ===
+    const ltvInput = document.getElementById('ltvPrice');
+    const today = new Date().toISOString().split('T')[0];
+    const storedDate = localStorage.getItem('ltvDate');
+    const storedValue = localStorage.getItem('ltvPrice');
+
+    if (storedValue && storedDate === today) {
+      ltvInput.value = storedValue;
+      ltvInput.readOnly = true;
+    } else if (storedValue) {
+      ltvInput.value = storedValue;
+    }
+
+    ltvInput.addEventListener('change', () => {
+      const newDate = new Date().toISOString().split('T')[0];
+      localStorage.setItem('ltvPrice', ltvInput.value);
+      localStorage.setItem('ltvDate', newDate);
+      ltvInput.readOnly = true;
     });
 
-    // Save AGLOG Price manually only on change
-    document.getElementById('ltvPrice').addEventListener('change', () => {
-      const value = document.getElementById('ltvPrice').value;
-      localStorage.setItem('ltvPrice', value);
-    });
+    // Auto-calculate on load
+    window.addEventListener('DOMContentLoaded', calculate);
   </script>
 </body>
 </html>
