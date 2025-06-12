@@ -4,51 +4,79 @@
   <meta charset="UTF-8">
   <title>RnRP / ITO Calculator</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f2f2f2;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eef1f5;
+      margin: 0;
+      padding: 30px;
     }
 
     .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
+      background: #ffffff;
+      padding: 30px;
+      max-width: 700px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      color: #333;
     }
 
     label {
       display: block;
-      margin-top: 15px;
+      margin: 18px 0 8px;
+      font-weight: 600;
+      color: #444;
     }
 
-    input {
+    input[type="number"] {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+      border-color: #007bff;
+      outline: none;
     }
 
     .result {
       margin-top: 20px;
-      font-weight: bold;
-      padding: 10px;
-      background: #e6f7ff;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 6px;
+      background-color: #f8f9fa;
+      font-size: 16px;
+      font-weight: 500;
     }
 
     .status-green {
-      color: green;
+      color: #28a745;
     }
 
     .status-red {
-      color: red;
+      color: #dc3545;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -62,34 +90,41 @@
     <label for="netWeight">Net Weight:</label>
     <input type="number" id="netWeight" step="0.01">
 
-    <label for="ltv">LTV:</label>
-    <input type="number" id="ltv" step="0.01">
+    <label for="ltvPrice">LTV Price:</label>
+    <input type="number" id="ltvPrice" step="0.01">
 
+    <label for="ltvPercent">LTV % (e.g., enter 90 for 90%):</label>
+    <input type="number" id="ltvPercent" step="0.01">
+
+    <div class="result" id="finalLtvPrice"></div>
     <div class="result" id="eligible"></div>
     <div class="result" id="daAmount"></div>
     <div class="result" id="status"></div>
   </div>
 
   <script>
-    const inputs = document.querySelectorAll('#closer, #netWeight, #ltv');
+    const inputs = document.querySelectorAll('#closer, #netWeight, #ltvPrice, #ltvPercent');
     inputs.forEach(input => input.addEventListener('input', calculate));
 
     function calculate() {
       const closer = parseFloat(document.getElementById('closer').value) || 0;
       const netWeight = parseFloat(document.getElementById('netWeight').value) || 0;
-      const ltv = parseFloat(document.getElementById('ltv').value) || 0;
+      const ltvPrice = parseFloat(document.getElementById('ltvPrice').value) || 0;
+      const ltvPercent = parseFloat(document.getElementById('ltvPercent').value) || 0;
 
-      const eligibleAmount = netWeight * ltv;
+      const finalLtvPrice = ltvPrice * (ltvPercent / 100);
+      const eligibleAmount = netWeight * finalLtvPrice;
       const daAmount = eligibleAmount - closer;
+      const isEligible = eligibleAmount >= closer;
 
+      document.getElementById('finalLtvPrice').innerText = "Final LTV Price: ₹" + finalLtvPrice.toFixed(2);
       document.getElementById('eligible').innerText = "Eligible RnRP/ITO Amount: ₹" + eligibleAmount.toFixed(2);
       document.getElementById('daAmount').innerText = "DA Amount: ₹" + daAmount.toFixed(2);
 
-      const statusText = eligibleAmount >= closer ? "Eligible for Process" : "Need Collect DA";
+      const statusText = isEligible ? "Eligible for Process" : "Need Collect DA";
       const statusDiv = document.getElementById('status');
-
       statusDiv.innerText = "RnRP / ITO: " + statusText;
-      statusDiv.className = "result " + (statusText === "Eligible for Process" ? "status-green" : "status-red");
+      statusDiv.className = "result " + (isEligible ? "status-green" : "status-red");
     }
   </script>
 </body>
